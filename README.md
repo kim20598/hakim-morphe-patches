@@ -148,7 +148,7 @@ The film's community rating is fully covered until you tap.
 ## Install
 
 1. On the device, open this link to add the source in Morphe Manager:
-   <https://morphe.software/add-source?github=mvaishak/letterboxd-morphe-patches>
+   <https://morphe.software/add-source?github=kim20598/hakim-morphe-patches>
 2. In the source settings, enable **pre-releases** for the newest (`dev`) builds,
    or leave it off for stable releases only.
 3. Load a clean, unpatched Letterboxd APK from
