@@ -207,15 +207,8 @@ public final class CustomPosterButton {
      *       definitively the one shown.</li>
      * </ol>
      *
-     * <p>{@code CENTER_CROP} is forced on both passes so the image fills the target view
-     * identically on every screen ratio. This matters because {@code CoilLoader} builds an
-     * {@code ImageRequest} with no explicit scale, so Coil defers to the target ImageView's
-     * scaleType. {@code FilmHeaderFragment.configureBackdrop} happens to set a suitable
-     * scaleType for the film banner before our hook runs, but
-     * {@code MemberHeaderFragment.applyMember} never touches {@code userBackdrop}'s
-     * scaleType — so a custom profile backdrop used to inherit whatever the layout XML had,
-     * which only happened to look right on the test aspect ratio. Forcing it here makes both
-     * paths screen-size independent.
+     * <p>See {@link #normaliseBackdropView(ImageView)} for the view-level forcing that makes
+     * the custom image fill the banner identically on every device.
      *
      * <p>Net effect: the server backdrop is visible for at most ~2 frames before ours replaces
      * it. At 60 fps that's ~33ms, below the perception threshold for most viewers.
@@ -223,26 +216,43 @@ public final class CustomPosterButton {
     private static void applyImageOverrideDeferred(final ImageView iv, final String url) {
         if (iv == null || url == null || url.isEmpty()) return;
 
-        // Immediate pass — force a screen-size-independent fill, cancel any pending Glide
-        // request, and load ours synchronously.
+        // Immediate pass — normalise the view, cancel any pending Glide request, load ours.
         try {
-            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            normaliseBackdropView(iv);
             cancelGlide(iv);
             CoilLoader.load(iv.getContext(), url, iv);
         } catch (Throwable ignored) {}
 
-        // Deferred pass — one or two frames later, in case the host method queued its own
-        // Glide request (or reset scaleType) before we ran. Re-assert, re-cancel, re-load so
-        // we definitively win.
+        // Deferred pass — re-assert in case the host reset anything between passes.
         MAIN.postDelayed(new Runnable() {
             @Override public void run() {
                 try {
-                    iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    normaliseBackdropView(iv);
                     cancelGlide(iv);
                     CoilLoader.load(iv.getContext(), url, iv);
                 } catch (Throwable ignored) {}
             }
         }, 32);
+    }
+
+    /**
+     * Forces the ImageView into a full-bleed banner: matches parent width, disables
+     * adjustViewBounds (so the view's size is not driven by the drawable's aspect ratio),
+     * and uses CENTER_CROP so the image fills whatever bounds result.
+     *
+     * <p>Only the width is forced. Height is left alone so the host's own vertical sizing
+     * (fixed height, aspect-ratio constraint, whatever) still applies.
+     */
+    private static void normaliseBackdropView(ImageView iv) {
+        try {
+            iv.setAdjustViewBounds(false);
+            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            ViewGroup.LayoutParams lp = iv.getLayoutParams();
+            if (lp != null && lp.width != ViewGroup.LayoutParams.MATCH_PARENT) {
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                iv.setLayoutParams(lp);
+            }
+        } catch (Throwable ignored) {}
     }
 
     private static void cancelGlide(View view) {
