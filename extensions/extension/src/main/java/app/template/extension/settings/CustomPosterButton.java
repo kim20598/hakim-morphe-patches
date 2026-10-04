@@ -207,23 +207,37 @@ public final class CustomPosterButton {
      *       definitively the one shown.</li>
      * </ol>
      *
+     * <p>{@code CENTER_CROP} is forced on both passes so the image fills the target view
+     * identically on every screen ratio. This matters because {@code CoilLoader} builds an
+     * {@code ImageRequest} with no explicit scale, so Coil defers to the target ImageView's
+     * scaleType. {@code FilmHeaderFragment.configureBackdrop} happens to set a suitable
+     * scaleType for the film banner before our hook runs, but
+     * {@code MemberHeaderFragment.applyMember} never touches {@code userBackdrop}'s
+     * scaleType — so a custom profile backdrop used to inherit whatever the layout XML had,
+     * which only happened to look right on the test aspect ratio. Forcing it here makes both
+     * paths screen-size independent.
+     *
      * <p>Net effect: the server backdrop is visible for at most ~2 frames before ours replaces
      * it. At 60 fps that's ~33ms, below the perception threshold for most viewers.
      */
     private static void applyImageOverrideDeferred(final ImageView iv, final String url) {
         if (iv == null || url == null || url.isEmpty()) return;
 
-        // Immediate pass — cancel any pending Glide request and load ours synchronously.
+        // Immediate pass — force a screen-size-independent fill, cancel any pending Glide
+        // request, and load ours synchronously.
         try {
+            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
             cancelGlide(iv);
             CoilLoader.load(iv.getContext(), url, iv);
         } catch (Throwable ignored) {}
 
         // Deferred pass — one or two frames later, in case the host method queued its own
-        // Glide request before we ran. Re-cancel and re-load so we definitively win.
+        // Glide request (or reset scaleType) before we ran. Re-assert, re-cancel, re-load so
+        // we definitively win.
         MAIN.postDelayed(new Runnable() {
             @Override public void run() {
                 try {
+                    iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     cancelGlide(iv);
                     CoilLoader.load(iv.getContext(), url, iv);
                 } catch (Throwable ignored) {}
