@@ -1,13 +1,13 @@
-group = "app.mvaishak"
+group = "app.hakim"
 
 patches {
     about {
-        name = "mvaishak Letterboxd Patches"
+        name = "hakim Letterboxd Patches"
         description = "Personal patches for the Letterboxd Android app"
-        source = "git@github.com:mvaishak/letterboxd-morphe-patches.git"
+        source = "git@github.com:kim20598/hakim-morphe-patches.git"
         author = "V"
         contact = "na"
-        website = "https://github.com/mvaishak/letterboxd-morphe-patches"
+        website = "https://github.com/kim20598/hakim-morphe-patches"
         license = "GPLv3"
     }
 }
