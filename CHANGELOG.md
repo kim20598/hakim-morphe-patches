@@ -1,3 +1,9 @@
+## [2.20.2](https://github.com/kim20598/hakim-morphe-patches/compare/v2.20.1...v2.20.2) (2026-10-04)
+
+### 🐛 Bug Fixes
+
+* force full-bleed width on custom profile backdrop ([aabd402](https://github.com/kim20598/hakim-morphe-patches/commit/aabd402092efbac5e88e91ce4a804f2031baabb4))
+
 ## [2.20.1](https://github.com/kim20598/hakim-morphe-patches/compare/v2.20.0...v2.20.1) (2026-10-04)
 
 ### 🐛 Bug Fixes
