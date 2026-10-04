@@ -1,3 +1,9 @@
+## [2.20.1](https://github.com/kim20598/hakim-morphe-patches/compare/v2.20.0...v2.20.1) (2026-10-04)
+
+### 🐛 Bug Fixes
+
+* force CENTER_CROP on custom backdrop ImageViews ([1f0ea8f](https://github.com/kim20598/hakim-morphe-patches/commit/1f0ea8f1281c048f541cbe5a47ab303a9fe279d1))
+
 ## [2.20.0](https://github.com/kim20598/Test-cloudstream1/compare/v2.19.0...v2.20.0) (2026-10-02)
 
 ### ✨ New Features
